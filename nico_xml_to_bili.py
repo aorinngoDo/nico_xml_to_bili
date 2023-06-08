@@ -6,7 +6,6 @@ import xml.etree.ElementTree as ET
 import unicodedata
 import argparse
 import xmltodict
-import pprint
 import re
 
 
@@ -72,7 +71,6 @@ def convert(input, output):
     
     chats = xml_dict['packet']['chat']
     chats = sorted(chats, key=lambda x: x['@vpos'].zfill(10))
-    # pprint.pprint(xml_dict)
 
     ### XMLに変換する辞書の雛形 ###
     converted_dict = {
@@ -88,8 +86,6 @@ def convert(input, output):
             ]
         }
         }
-    
-
 
     ### 公式コメントと壊れたコメントを選別 ###
     officeId = []
@@ -173,6 +169,7 @@ def convert(input, output):
         color = '16777215'
         color_important = 0
 
+        ### mail 内のコマンドを処理 ###
         for style in mail.split(' '):
             if re.match(r'#([0-9A-Fa-f]{6})', style):
                 m = re.match(r'([0-9A-Fa-f]{6})', style)
@@ -186,7 +183,7 @@ def convert(input, output):
             elif style in font_size_map:
                 font_size = font_size_map[style]
 
-        ### コメントとスタイル等を辞書に追加する
+        ### コメントとスタイル等を辞書に追加する ###
         comment_dict = {
             '@p': ','.join([seconds, danmaku_type, font_size, color, date, '0', user_id, '0', '1']) ,
             '#text': text
@@ -195,11 +192,15 @@ def convert(input, output):
             
     converted_dict['i']['chatid'] = chatid
     
-    ### 書き出し ###
+    ### ファイル書き出し ###
+    output = safefilename(output,table=table2)
     output_str = xmltodict.unparse(converted_dict, pretty=True)
 
     with open(output, "w", encoding='utf-8') as file:
         file.write(output_str)
+
+
+
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(description='niconico danmaku xml to bilibili danmaku xml.', add_help=True)
