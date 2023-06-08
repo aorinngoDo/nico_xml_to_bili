@@ -172,9 +172,9 @@ def convert(input, output):
         ### mail 内のコマンドを処理 ###
         for style in mail.split(' '):
             if re.match(r'#([0-9A-Fa-f]{6})', style):
-                m = re.match(r'([0-9A-Fa-f]{6})', style)
+                m = re.match(r'#([0-9A-Fa-f]{6})', style)
                 # 16進 - 10進変換
-                color = int(str(m[1]), 16)
+                color = int(str(m[0])[1:], 16)
                 color = str(color)
             elif style in color_map:
                 color = color_map[style]
